@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff4f81">
+  <meta name="description" content="A tiny romantic yes-or-no game for Nidhi.">
+  <title>Hey Nidhi ❤️</title>
+  <style>
+    :root {
+      --pink: #ff2f6d;
+      --hot: #ff1744;
+      --deep: #65001f;
+      --ink: #ffffff;
+      --card: #16080d;
+      --muted: #ffb8c9;
+      --black: #090507;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background: #090507;
+    }
+
+    button, input { font: inherit; }
+
+    .app {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: max(72px, env(safe-area-inset-top) + 60px) 14px max(24px, env(safe-area-inset-bottom));
+      isolation: isolate;
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -40px;
+      opacity: .65;
+      animation: floatUp linear infinite;
+      filter: drop-shadow(0 4px 8px rgba(113, 10, 46, .12));
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(0deg) scale(.8); }
+      to { transform: translateY(-115vh) rotate(35deg) scale(1.2); }
+    }
+
+    .music {
+      position: fixed;
+      top: max(10px, env(safe-area-inset-top));
+      right: max(10px, env(safe-area-inset-right));
+      z-index: 10;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 13px;
+      min-height: 42px;
+      color: #ffffff;
+      background: #ff1744;
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(65, 8, 29, .18);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .music:hover { transform: translateY(-2px); background: rgba(65, 8, 29, .84); }
+
+    .card {
+      width: 100%;
+      max-width: 700px;
+      max-height: calc(100svh - 96px);
+      overflow: auto;
+      padding: 28px 18px 30px;
+      text-align: center;
+      border-radius: 8px;
+      background: var(--card);
+      border: 3px solid var(--hot);
+      box-shadow: 7px 7px 0 #ff1744;
+      animation: pop .45s ease both;
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(18px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #ffffff;
+      font-size: clamp(2.4rem, 9vw, 5rem);
+      line-height: .88;
+      font-weight: 1000;
+      letter-spacing: -.065em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      margin: 0 auto 8px;
+      max-width: 560px;
+      color: var(--muted);
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    h1 {
+      margin: 16px 0 32px;
+      color: #ffffff;
+      font-size: clamp(2.4rem, 9vw, 5rem);
+      line-height: .9;
+      font-weight: 1000;
+      letter-spacing: -.065em;
+    }
+
+    .actions {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      min-height: 118px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 7px;
+      padding: 15px 18px;
+      min-width: 0;
+      width: 48%;
+      min-height: 54px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 900;
+      transition: transform .2s ease, box-shadow .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .yes {
+      color: white;
+      background: linear-gradient(135deg, var(--hot), var(--pink));
+      box-shadow: 0 12px 28px rgba(255, 23, 68, .3);
+    }
+
+    .yes:hover { transform: translateY(-3px) scale(1.02); }
+
+    .no {
+      color: var(--ink);
+      background: #ffe2eb;
+      box-shadow: 0 8px 20px rgba(82, 9, 34, .1);
+      position: relative;
+    }
+
+    .warning {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+      font-weight: 850;
+    }
+
+    .sarcasm {
+      margin: -10px auto 22px;
+      max-width: 520px;
+      padding: 12px 14px;
+      color: #090507;
+      background: #ffcfdb;
+      border-radius: 5px;
+      font-size: .88rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .step {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 7px 11px;
+      color: #090507;
+      background: #ffffff;
+      border-radius: 4px;
+      font-size: .75rem;
+      font-weight: 1000;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .wishes {
+      display: grid;
+      gap: 14px;
+      margin: 28px 0 20px;
+      text-align: left;
+    }
+
+    .wish-label {
+      display: grid;
+      gap: 7px;
+      color: #ffffff;
+      font-weight: 950;
+    }
+
+    .wish-input {
+      width: 100%;
+      border: 2px solid #ff426f;
+      border-radius: 5px;
+      padding: 15px 16px;
+      outline: none;
+      background: #ffffff;
+      color: #18070d;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .wish-input:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 4px rgba(255,79,129,.12);
+    }
+
+    .submit {
+      width: 100%;
+      color: #090507;
+      background: #ffffff;
+      box-shadow: 7px 7px 0 var(--hot);
+    }
+
+    .submit:hover { transform: translateY(-2px); }
+
+    .success-icon {
+      font-size: clamp(3rem, 12vw, 5.5rem);
+      margin-bottom: 8px;
+      animation: bounce .8s ease both;
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(.4) rotate(-15deg); opacity: 0; }
+      70% { transform: scale(1.12) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .success h1 { margin-bottom: 12px; }
+    .success p { font-size: 1.1rem; font-weight: 700; opacity: .78; }
+
+    .hidden { display: none !important; }
+
+    @media (min-width: 600px) {
+      .app {
+        padding: 90px 24px 32px;
+      }
+
+      .card {
+        padding: 54px clamp(34px, 7vw, 64px);
+        max-height: calc(100svh - 120px);
+        box-shadow: 14px 14px 0 #ff1744;
+      }
+
+      .actions {
+        gap: 16px;
+        min-height: 90px;
+      }
+
+      .btn {
+        width: auto;
+        min-width: 150px;
+      }
+
+      .music {
+        top: 18px;
+        right: 18px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
+
+  <audio id="music" loop preload="none">
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <button class="music" id="musicBtn" type="button" aria-label="Play romantic music">🔊 Play Music</button>
+
+  <main class="app">
+    <section class="card" id="questionScreen">
+      <p class="eyebrow">Hey Nidhi ❤️</p>
+      <p class="intro">I have one extremely serious question...</p>
+
+      <div class="sarcasm">
+        <span class="step">Step 1/5</span><br>
+        Please answer the question like a totally normal person. 😌
+      </div>
+
+      <h1>Do you love me? 😌</h1>
+
+      <div class="actions" id="actions">
+        <button class="btn yes" id="yesBtn" type="button">YES ❤️</button>
+        <button class="btn no" id="noBtn" type="button">NO 😈</button>
+      </div>
+
+      <p class="warning" id="warning">Warning: The NO button has commitment issues. 😂</p>
+    </section>
+
+    <section class="card hidden" id="wishScreen">
+      <p class="eyebrow">Good choice. 😌❤️</p>
+      <p class="intro">Now you get THREE wishes.</p>
+      <h1>Choose wisely. 👑</h1>
+
+      <form id="wishForm">
+        <div class="wishes">
+          <label class="wish-label">
+            Wish #1 ✨
+            <input class="wish-input" name="wish1" required maxlength="180" placeholder="Your first wish...">
+          </label>
+          <label class="wish-label">
+            Wish #2 💕
+            <input class="wish-input" name="wish2" required maxlength="180" placeholder="Your second wish...">
+          </label>
+          <label class="wish-label">
+            Wish #3 👑
+            <input class="wish-input" name="wish3" required maxlength="180" placeholder="Your third wish...">
+          </label>
+        </div>
+        <button class="btn submit" type="submit">Submit My Wishes ❤️</button>
+      </form>
+    </section>
+
+    <section class="card hidden success" id="successScreen">
+      <div class="success-icon">💌</div>
+      <p class="eyebrow">Wishes received. ❤️</p>
+      <h1>Congratulations Nidhi, you defeated the game. 😂❤️</h1>
+      <p>Your wishes have been officially accepted by the boyfriend department. 👨‍💼💖</p>
+    </section>
+  </main>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const actions = document.getElementById("actions");
+    const warning = document.getElementById("warning");
+    const questionScreen = document.getElementById("questionScreen");
+    const wishScreen = document.getElementById("wishScreen");
+    const successScreen = document.getElementById("successScreen");
+    const wishForm = document.getElementById("wishForm");
+    const music = document.getElementById("music");
+    const musicBtn = document.getElementById("musicBtn");
+
+    let noAttempts = 0;
+
+    const funnyMessages = [
+      "Step 1/5 — Nice try. 😏",
+      "Step 2/5 — Fascinating decision-making skills. 😂",
+      "Step 3/5 — The button has escaped. Maybe reflect on that. 😈",
+      "Step 4/5 — You are negotiating with a button. We need to talk. 😂",
+      "Step 5/5 — At this point, the button has more commitment than you do. ❤️"
+    ];
+
+    function moveNoButton() {
+      playFaaa();
+      const button = noBtn.getBoundingClientRect();
+      const padding = 8;
+
+      noBtn.style.position = "fixed";
+
+      const maxX = Math.max(padding, window.innerWidth - button.width - padding);
+      const maxY = Math.max(padding + 60, window.innerHeight - button.height - padding);
+
+      let x = padding + Math.random() * Math.max(0, maxX - padding);
+      let y = 60 + Math.random() * Math.max(0, maxY - 60);
+
+      // Keep it reasonably catchable and away from the music control.
+      if (y < 90 && x > window.innerWidth - 220) y += 120;
+
+      noBtn.style.left = `${Math.min(x, maxX)}px`;
+      noBtn.style.top = `${Math.min(y, maxY)}px`;
+      noAttempts++;
+      warning.textContent = funnyMessages[Math.min(noAttempts - 1, funnyMessages.length - 1)];
+    }
+
+    ["mouseenter", "pointerdown", "touchstart", "focus"].forEach(eventName => {
+      noBtn.addEventListener(eventName, event => {
+        event.preventDefault();
+        moveNoButton();
+      }, { passive: false });
+    });
+
+    noBtn.addEventListener("click", event => {
+      event.preventDefault();
+      moveNoButton();
+    });
+
+    yesBtn.addEventListener("click", () => {
+      questionScreen.classList.add("hidden");
+      wishScreen.classList.remove("hidden");
+      noBtn.style.position = "";
+      noBtn.style.left = "";
+      noBtn.style.top = "";
+    });
+
+    wishForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!wishForm.reportValidity()) return;
+      wishScreen.classList.add("hidden");
+      successScreen.classList.remove("hidden");
+    });
+
+    // Optional background track: place music.mp3 beside this file.
+    musicBtn.addEventListener("click", async () => {
+      if (music.paused) {
+        try {
+          await music.play();
+          musicBtn.textContent = "⏸ Pause Music";
+        } catch {
+          musicBtn.textContent = "🎵 Add music.mp3";
+        }
+      } else {
+        music.pause();
+        musicBtn.textContent = "🔊 Play Music";
+      }
+    });
+
+    music.addEventListener("error", () => {
+      musicBtn.textContent = "🎵 Add music.mp3";
+    });
+
+    // No external audio library needed: make a ridiculous "FAAA FAAAA FAAAAA"
+    // warning sound when she tries to escape through the NO button.
+    let audioCtx;
+    let faaTimer;
+
+    function playFaaa() {
+      try {
+        audioCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const notes = [
+          { t: 0.00, f: 180, d: 0.38 },
+          { t: 0.34, f: 125, d: 0.48 },
+          { t: 0.78, f: 82,  d: 0.72 }
+        ];
+
+        notes.forEach(({ t, f, d }) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(f, now + t);
+          osc.frequency.exponentialRampToValueAtTime(Math.max(45, f * 0.55), now + t + d);
+
+          gain.gain.setValueAtTime(0.0001, now + t);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + t + 0.035);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + t + d);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + t);
+          osc.stop(now + t + d + 0.03);
+        });
+      } catch (_) {
+        // Audio is a bonus; the game still works if the browser blocks Web Audio.
+      }
+    }
+
+    // Small, lightweight floating-heart effect.
+    const heartContainer = document.getElementById("hearts");
+    const heartSymbols = ["♥", "♡", "❤", "💕", "💗"];
+
+    for (let i = 0; i < 18; i++) {
+      const heart = document.createElement("span");
+      heart.className = "heart";
+      heart.textContent = heartSymbols[i % heartSymbols.length];
+      heart.style.left = `${Math.random() * 100}%`;
+      heart.style.fontSize = `${14 + Math.random() * 22}px`;
+      heart.style.animationDuration = `${8 + Math.random() * 9}s`;
+      heart.style.animationDelay = `${Math.random() * -15}s`;
+      heartContainer.appendChild(heart);
+    }
+  </script>
+</body>
+</html>
